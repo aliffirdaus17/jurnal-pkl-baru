@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Persetujuan Izin/Sakit/Terlambat - Panel Pembimbing</title>
+    
+    <!-- FAVICON (LOGO TAB BROWSER) -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-main: #f1f5f9;
+            --bg-surface: #ffffff;
+            
+            /* Sidebar Dark Solid Modern */
+            --bg-sidebar: #0f172a;
+            --sidebar-header-bg: #1e293b;
+            --sidebar-border: rgba(255, 255, 255, 0.08);
+            --sidebar-text: #94a3b8;
+            --sidebar-text-active: #ffffff;
+            --sidebar-hover-bg: #1e293b;
+            --sidebar-active-bg: #4f46e5;
+            
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --primary-border: #c7d2fe;
+            
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+
+            --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* KUNCI TINGGI BODY & CEGAH SCROLL UTAMA */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ================= SIDEBAR TERKUNCI ================= */
+        .sidebar {
+            width: 270px;
+            background-color: var(--bg-sidebar);
+            color: #ffffff;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--sidebar-border);
+            padding: 22px 16px;
+            justify-content: space-between;
+            box-shadow: 4px 0 16px rgba(0, 0, 0, 0.08);
+            z-index: 20;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background-color: var(--sidebar-header-bg);
+            border: 1px solid var(--sidebar-border);
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+        }
+
+        .brand-logo-img {
+            width: 38px;
+            height: 38px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .brand-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .brand-subtitle {
+            font-size: 0.725rem;
+            color: #818cf8;
+            font-weight: 600;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            flex-grow: 1;
+        }
+
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-label {
+            font-size: 0.6875rem;
+            font-weight: 800;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0 12px 6px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 14px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .menu-link-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-menu li a svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2.2;
+            transition: var(--transition);
+            opacity: 0.8;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: var(--sidebar-hover-bg);
+            color: var(--sidebar-text-active);
+            transform: translateX(3px);
+        }
+
+        .sidebar-menu li a:hover svg {
+            opacity: 1;
+            color: #818cf8;
+        }
+
+        .sidebar-menu li a.active {
+            background-color: var(--sidebar-active-bg);
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+        }
+
+        .sidebar-menu li a.active svg {
+            color: #ffffff;
+            opacity: 1;
+        }
+
+        .menu-badge {
+            background-color: #ef4444;
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 9999px;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+        }
+
+        /* MAIN LAYOUT & NAVBAR TERKUNCI */
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            height: 70px;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            z-index: 10;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .navbar-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .btn-profile-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 14px 5px 5px;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 9999px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: var(--shadow-xs);
+            position: relative;
+        }
+
+        .btn-profile-nav:hover {
+            border-color: var(--primary-border);
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .avatar-wrapper {
+            position: relative;
+        }
+
+        .nav-avatar-placeholder {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, #818cf8 100%);
+            color: #ffffff;
+            font-size: 0.8125rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 9px;
+            height: 9px;
+            background-color: #22c55e;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+        }
+
+        .btn-logout-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #ef4444;
+            background-color: #fef2f2;
+            border: 1px solid #fee2e2;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .btn-logout-nav:hover {
+            background-color: #fde8e8;
+            border-color: #fca5a5;
+            transform: translateY(-1px);
+        }
+
+        /* HANYA KONTEN YANG BISA DI-SCROLL */
+        .content {
+            padding: 32px;
+            padding-right: 48px;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        /* ALERT FLASH */
+        .alert {
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .alert-success { background-color: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+        .alert-danger, .alert-error { background-color: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
+        /* TABLE CONTAINER & CARD */
+        .card {
+            background-color: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text-main);
+            background-color: var(--bg-surface);
+            letter-spacing: -0.01em;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        th {
+            background-color: var(--bg-main);
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-main);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr { transition: var(--transition); }
+        tr:hover td { background-color: #f8fafc; }
+
+        /* BADGES */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 9999px;
+            letter-spacing: 0.01em;
+        }
+
+        .badge-pending { background-color: #fef3c7; color: #b45309; }
+        .badge-disetujui { background-color: #dcfce7; color: #15803d; }
+        .badge-ditolak { background-color: #fee2e2; color: #b91c1c; }
+
+        /* Kustomisasi Button Bukti Lampiran */
+        .link-bukti {
+            display: inline-block;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #ef4444;
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .link-bukti.sudah-dilihat {
+            background-color: #10b981;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+        }
+
+        .link-bukti:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Kustomisasi Button Aksi */
+        .btn-acc, .btn-reject {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-disabled {
+            background-color: #94a3b8 !important;
+            color: #ffffff !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .btn-acc {
+            background-color: #10b981;
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-acc:hover {
+            background-color: #059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-reject {
+            background-color: #ef4444;
+            color: #ffffff;
+            margin-left: 6px;
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-reject:hover {
+            background-color: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .text-finished {
+            color: var(--text-light);
+            font-size: 0.8125rem;
+            font-weight: 600;
+        }
+
+        /* MODAL UMUM & LOGOUT */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.6);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-box {
+            background-color: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 520px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .close-btn {
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .modal-box-logout {
+            background-color: var(--bg-surface);
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 420px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .modal-icon-logout {
+            width: 56px;
+            height: 56px;
+            background-color: #fef2f2;
+            color: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border: 1px solid #fee2e2;
+        }
+
+        .modal-title-logout { font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .modal-desc-logout { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
+        .modal-actions-logout { display: flex; gap: 12px; }
+
+        .btn-modal {
+            flex: 1;
+            padding: 11px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-decoration: none;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .btn-modal-cancel { background-color: var(--bg-surface); color: var(--text-main); border-color: var(--border-color); }
+        .btn-modal-confirm { background-color: #ef4444; color: #ffffff; }
+
+        @media (max-width: 768px) {
+            html, body { overflow: auto; height: auto; }
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; overflow-y: visible; border-right: none; border-bottom: 1px solid var(--sidebar-border); }
+            .sidebar-nav { gap: 12px; }
+            .sidebar-menu { flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
+            .sidebar-menu li a { white-space: nowrap; }
+            .main-wrapper { height: auto; overflow: visible; }
+            .content { overflow-y: visible; padding: 16px; }
+            .navbar { padding: 0 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR DARK SOLID TERKUNCI -->
+    <div class="sidebar">
+        <div>
+            <div class="sidebar-brand">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="brand-logo-img">
+                <div class="brand-text">
+                    <span class="brand-title">E-Jurnal PKL</span> 
+                    <span class="brand-subtitle">Panel Pembimbing</span>
+                </div>
+            </div>
+
+            <div class="sidebar-nav">
+                <div class="nav-group">
+                    <span class="nav-label">Main Menu</span>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="{{ url_for('dashboard_pembimbing') }}" class="{{ 'active' if request.endpoint == 'dashboard_pembimbing' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                                    Dashboard
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-label">Siswa & Absensi</span>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="{{ url_for('daftar_siswa') }}" class="{{ 'active' if request.endpoint in ['daftar_siswa', 'detail_siswa'] else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    Daftar Siswa
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('tambah_siswa_page') }}" class="{{ 'active' if request.endpoint == 'tambah_siswa_page' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                                    Tambah Siswa
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('persetujuan_absensi') }}" class="{{ 'active' if request.endpoint == 'persetujuan_absensi' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                    Persetujuan Izin/Sakit
+                                </div>
+                                {% if pengajuan and pengajuan.pending_izin > 0 %}
+                                    <span class="menu-badge">{{ pengajuan.pending_izin }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('riwayat_absensi') }}" class="{{ 'active' if request.endpoint == 'riwayat_absensi' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                    Absensi Siswa
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-label">Jurnal & Laporan</span>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="{{ url_for('validasi_laporan') }}" class="{{ 'active' if request.endpoint in ['validasi_laporan', 'validasi_detail'] else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                    Validasi Laporan
+                                </div>
+                                {% if laporan and (laporan.pending | default(0)) > 0 %}
+                                    <span class="menu-badge">{{ laporan.pending }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="navbar">
+            <div class="navbar-title">Persetujuan Pengajuan Izin / Sakit</div>
+            
+            <div class="navbar-right">
+                <a href="{{ url_for('profil_pembimbing') }}" class="btn-profile-nav">
+                    <div class="avatar-wrapper">
+                        <div class="nav-avatar-placeholder">
+                            {{ session['nama'][0]|upper }}
+                        </div>
+                        <span class="status-indicator"></span>
+                    </div>
+                    <span>{{ session['nama'] }}</span>
+                </a>
+
+                <button type="button" class="btn-logout-nav" onclick="openLogoutModal()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- FLASH MESSAGES -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <div class="card">
+                <div class="card-header">Daftar Pengajuan Masuk</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Siswa</th>
+                                <th>Kelas</th>
+                                <th>Tanggal</th>
+                                <th>Status</th>
+                                <th>Alasan</th>
+                                <th>Bukti Lampiran</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if pengajuan_list %}
+                                {% for p in pengajuan_list %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td><strong>{{ p.nama_siswa }}</strong></td>
+                                    <td>{{ p.kelas_jurusan }}</td>
+                                    <td>{{ p.tanggal }}</td>
+                                    <td><strong>{{ p.jenis }}</strong></td>
+                                    <td>{{ p.alasan }}</td>
+                                    <td>
+                                        {% if p.bukti_file %}
+                                            <a href="javascript:void(0);" 
+                                            class="link-bukti {% if p.sudah_dilihat == 1 %}sudah-dilihat{% endif %}" 
+                                            id="bukti-{{ p.id }}" 
+                                            onclick="previewImage('{{ url_for('uploaded_file', filename=p.bukti_file) }}', '{{ p.id }}')">
+                                            Lihat Bukti
+                                            </a>
+                                        {% else %}
+                                            <span style="color: var(--text-light);">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if p.status_pengajuan == 'Pending' %}
+                                            <span class="badge badge-pending">Pending</span>
+                                        {% elif p.status_pengajuan == 'Disetujui' %}
+                                            <span class="badge badge-disetujui">Disetujui</span>
+                                        {% else %}
+                                            <span class="badge badge-ditolak">Ditolak</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if p.status_pengajuan == 'Pending' %}
+                                            {% set url_setuju = url_for('proses_pengajuan', id=p.id, aksi='Disetujui') %}
+                                            {% set url_tolak = url_for('proses_pengajuan', id=p.id, aksi='Ditolak') %}
+                                            
+                                            {% if p.bukti_file %}
+                                                <button type="button" 
+                                                   class="btn-acc {% if p.sudah_dilihat != 1 %}btn-disabled{% endif %}" 
+                                                   id="btn-acc-{{ p.id }}" 
+                                                   onclick="openAksiModal('{{ url_setuju }}', 'Disetujui')">&check; Setujui</button>
+                                                
+                                                <button type="button" 
+                                                   class="btn-reject {% if p.sudah_dilihat != 1 %}btn-disabled{% endif %}" 
+                                                   id="btn-rej-{{ p.id }}" 
+                                                   onclick="openAksiModal('{{ url_tolak }}', 'Ditolak')">&cross; Tolak</button>
+                                            {% else %}
+                                                <button type="button" class="btn-acc" onclick="openAksiModal('{{ url_setuju }}', 'Disetujui')">&check; Setujui</button>
+                                                <button type="button" class="btn-reject" onclick="openAksiModal('{{ url_tolak }}', 'Ditolak')">&cross; Tolak</button>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-finished">Selesai</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="9" style="text-align: center; color: var(--text-light); padding: 32px;">Belum ada pengajuan izin/sakit.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP MODAL PREVIEW BUKTI LAMPIRAN -->
+    <div id="imagePreviewModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 520px; text-align: center;">
+            <div class="modal-header">
+                <div class="modal-title">Bukti Lampiran Izin/Sakit</div>
+                <button type="button" class="close-btn" onclick="closeImagePreview()">&times;</button>
+            </div>
+            <div style="padding: 12px 0;">
+                <img id="previewImgModal" src="" alt="Bukti Lampiran" style="width: 100%; max-height: 420px; object-fit: contain; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            </div>
+            <div style="margin-top: 12px;">
+                <button type="button" class="btn-modal btn-modal-cancel" onclick="closeImagePreview()" style="max-width: 120px; margin: 0 auto; display: block;">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP MODAL KONFIRMASI AKSI (SETUJU / TOLAK) -->
+    <div id="aksiModal" class="modal-overlay">
+        <div class="modal-box-logout">
+            <div class="modal-icon-logout" id="modalAksiIcon">?</div>
+            <div class="modal-title-logout" id="modalAksiTitle">Konfirmasi Aksi</div>
+            <div class="modal-desc-logout" id="modalAksiDesc">Apakah Anda yakin ingin memproses pengajuan ini?</div>
+            <div class="modal-actions-logout">
+                <button type="button" class="btn-modal btn-modal-cancel" onclick="closeAksiModal()">Batal</button>
+                <a href="#" id="btnModalConfirm" class="btn-modal btn-modal-confirm">Ya, Lanjutkan</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP LOGOUT -->
+    <div id="logoutModal" class="modal-overlay">
+        <div class="modal-box-logout">
+            <div class="modal-icon-logout">!</div>
+            <div class="modal-title-logout">Konfirmasi Logout</div>
+            <div class="modal-desc-logout">Apakah Anda yakin ingin keluar dari aplikasi E-Jurnal PKL?</div>
+            <div class="modal-actions-logout">
+                <button type="button" class="btn-modal btn-modal-cancel" onclick="closeLogoutModal()">Batal</button>
+                <a href="{{ url_for('logout') }}" class="btn-modal btn-modal-confirm">Ya, Keluar</a>
+            </div>
+        </div>
+    </div>
+
+<script>
+    function previewImage(src, id) {
+        const modal = document.getElementById('imagePreviewModal');
+        const img = document.getElementById('previewImgModal');
+        
+        if (modal && img) {
+            img.src = src;
+            modal.style.display = 'flex';
+        }
+
+        tandaiSudahDilihat(id);
+
+        fetch('/tandai-dilihat/' + id, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status !== 'success') {
+                console.error('Gagal menyimpan status ke database:', data.message);
+            }
+        })
+        .catch(error => console.error('Error AJAX:', error));
+    }
+
+    function closeImagePreview() {
+        const modal = document.getElementById('imagePreviewModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // MEMBUKA MODAL KONFIRMASI DENGAN URL ROUTE YANG BENAR DARI JINJA2
+    function openAksiModal(targetUrl, aksi) {
+        const modal = document.getElementById('aksiModal');
+        const title = document.getElementById('modalAksiTitle');
+        const desc = document.getElementById('modalAksiDesc');
+        const btnConfirm = document.getElementById('btnModalConfirm');
+        const icon = document.getElementById('modalAksiIcon');
+
+        if (aksi === 'Disetujui') {
+            title.innerText = 'Konfirmasi Setujui';
+            desc.innerText = 'Apakah Anda yakin ingin menyetujui pengajuan ketidakhadiran siswa ini?';
+            btnConfirm.style.backgroundColor = '#10b981';
+            btnConfirm.innerText = 'Ya, Setujui';
+            icon.style.backgroundColor = '#dcfce7';
+            icon.style.color = '#15803d';
+            icon.style.borderColor = '#bbf7d0';
+            icon.innerText = '✓';
+        } else {
+            title.innerText = 'Konfirmasi Tolak';
+            desc.innerText = 'Apakah Anda yakin ingin menolak pengajuan ketidakhadiran siswa ini?';
+            btnConfirm.style.backgroundColor = '#ef4444';
+            btnConfirm.innerText = 'Ya, Tolak';
+            icon.style.backgroundColor = '#fef2f2';
+            icon.style.color = '#ef4444';
+            icon.style.borderColor = '#fee2e2';
+            icon.innerText = '✕';
+        }
+
+        // Pasang URL yang dibangun oleh Jinja2
+        btnConfirm.href = targetUrl;
+        
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    function closeAksiModal() {
+        const modal = document.getElementById('aksiModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    function tandaiSudahDilihat(id) {
+        const btnBukti = document.getElementById('bukti-' + id);
+        const btnAcc = document.getElementById('btn-acc-' + id);
+        const btnRej = document.getElementById('btn-rej-' + id);
+
+        if (btnBukti) {
+            btnBukti.classList.add('sudah-dilihat');
+        }
+        if (btnAcc) {
+            btnAcc.classList.remove('btn-disabled');
+        }
+        if (btnRej) {
+            btnRej.classList.remove('btn-disabled');
+        }
+    }
+
+    function openLogoutModal() {
+        document.getElementById('logoutModal').style.display = 'flex';
+    }
+
+    function closeLogoutModal() {
+        document.getElementById('logoutModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        const logoutModal = document.getElementById('logoutModal');
+        const previewModal = document.getElementById('imagePreviewModal');
+        const aksiModal = document.getElementById('aksiModal');
+
+        if (event.target === logoutModal) {
+            closeLogoutModal();
+        }
+        if (event.target === previewModal) {
+            closeImagePreview();
+        }
+        if (event.target === aksiModal) {
+            closeAksiModal();
+        }
+    }
+</script>
+
+</body>
+</html>

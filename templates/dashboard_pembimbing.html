@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Pembimbing - E-Jurnal PKL</title>
+    
+    <!-- FAVICON (LOGO TAB BROWSER) -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-main: #f1f5f9;
+            --bg-surface: #ffffff;
+            
+            /* Sidebar Dark Solid Modern */
+            --bg-sidebar: #0f172a;
+            --sidebar-header-bg: #1e293b;
+            --sidebar-border: rgba(255, 255, 255, 0.08);
+            --sidebar-text: #94a3b8;
+            --sidebar-text-active: #ffffff;
+            --sidebar-hover-bg: #1e293b;
+            --sidebar-active-bg: #4f46e5;
+            
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --primary-border: #c7d2fe;
+            
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+
+            --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* KUNCI TINGGI BODY & CEGAH SCROLL UTAMA */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+        }
+
+        /* ================= SIDEBAR TERKUNCI ================= */
+        .sidebar {
+            width: 270px;
+            background-color: var(--bg-sidebar);
+            color: #ffffff;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--sidebar-border);
+            padding: 22px 16px;
+            justify-content: space-between;
+            box-shadow: 4px 0 16px rgba(0, 0, 0, 0.08);
+            z-index: 20;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background-color: var(--sidebar-header-bg);
+            border: 1px solid var(--sidebar-border);
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+        }
+
+        /* LOGO DI ATAS KIRI SIDEBAR */
+        .brand-logo-img {
+            width: 38px;
+            height: 38px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .brand-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .brand-subtitle {
+            font-size: 0.725rem;
+            color: #818cf8;
+            font-weight: 600;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            flex-grow: 1;
+        }
+
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-label {
+            font-size: 0.6875rem;
+            font-weight: 800;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0 12px 6px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 14px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .menu-link-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-menu li a svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2.2;
+            transition: var(--transition);
+            opacity: 0.8;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: var(--sidebar-hover-bg);
+            color: var(--sidebar-text-active);
+            transform: translateX(3px);
+        }
+
+        .sidebar-menu li a:hover svg {
+            opacity: 1;
+            color: #818cf8;
+        }
+
+        .sidebar-menu li a.active {
+            background-color: var(--sidebar-active-bg);
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+        }
+
+        .sidebar-menu li a.active svg {
+            color: #ffffff;
+            opacity: 1;
+        }
+
+        .menu-badge {
+            background-color: #ef4444;
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 9999px;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+        }
+
+        /* MAIN LAYOUT & NAVBAR TERKUNCI */
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            height: 70px;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            z-index: 10;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .navbar-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .btn-profile-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 14px 5px 5px;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 9999px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: var(--shadow-xs);
+            position: relative;
+        }
+
+        .btn-profile-nav:hover {
+            border-color: var(--primary-border);
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .avatar-wrapper {
+            position: relative;
+        }
+
+        .nav-avatar-placeholder {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, #818cf8 100%);
+            color: #ffffff;
+            font-size: 0.8125rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 9px;
+            height: 9px;
+            background-color: #22c55e;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+        }
+
+        .btn-logout-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #ef4444;
+            background-color: #fef2f2;
+            border: 1px solid #fee2e2;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .btn-logout-nav:hover {
+            background-color: #fde8e8;
+            border-color: #fca5a5;
+            transform: translateY(-1px);
+        }
+
+        /* HANYA KONTEN YANG BISA DI-SCROLL */
+        .content {
+            padding: 32px;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .welcome-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .welcome-card h3 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+
+        .welcome-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 22px;
+            box-shadow: var(--shadow-xs);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3.5px;
+            background: var(--card-accent, #cbd5e1);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-accent-primary { --card-accent: #4f46e5; }
+        .card-accent-warning { --card-accent: #f59e0b; }
+        .card-accent-danger { --card-accent: #ef4444; }
+        .card-accent-success { --card-accent: #10b981; }
+
+        .card-title {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card-value {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+
+        .val-primary { color: var(--primary); }
+        .val-success { color: #10b981; }
+        .val-warning { color: #f59e0b; }
+        .val-danger { color: #ef4444; }
+
+        /* TABLE DESIGN */
+        .table-container {
+            background-color: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-search {
+            position: relative;
+            width: 240px;
+        }
+
+        .table-search input {
+            width: 100%;
+            padding: 7px 12px 7px 32px;
+            font-size: 0.8125rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .table-search input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        }
+
+        .table-search svg {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            color: var(--text-light);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        th {
+            background-color: var(--bg-main);
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-main);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr { transition: var(--transition); }
+        tr:hover td { background-color: #f8fafc; }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 9999px;
+            letter-spacing: 0.01em;
+        }
+
+        .badge-pending { background-color: #fef3c7; color: #b45309; }
+        .badge-disetujui { background-color: #dcfce7; color: #15803d; }
+        .badge-revisi { background-color: #fee2e2; color: #b91c1c; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary { 
+            background-color: var(--primary); 
+            color: #ffffff; 
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.25);
+        }
+        .btn-primary:hover { 
+            background-color: var(--primary-hover); 
+            transform: translateY(-1px);
+        }
+        .btn-sm { padding: 6px 14px; font-size: 0.8125rem; }
+
+        /* MODAL LOGOUT */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.6);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-box-logout {
+            background-color: var(--bg-surface);
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 420px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .modal-icon-logout {
+            width: 56px;
+            height: 56px;
+            background-color: #fef2f2;
+            color: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border: 1px solid #fee2e2;
+        }
+
+        .modal-title-logout { font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .modal-desc-logout { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
+        .modal-actions-logout { display: flex; gap: 12px; }
+
+        .btn-modal {
+            flex: 1;
+            padding: 11px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-decoration: none;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .btn-modal-cancel { background-color: var(--bg-surface); color: var(--text-main); border-color: var(--border-color); }
+        .btn-modal-confirm { background-color: #ef4444; color: #ffffff; }
+
+        @media (max-width: 768px) {
+            html, body { overflow: auto; height: auto; }
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; overflow-y: visible; border-right: none; border-bottom: 1px solid var(--sidebar-border); }
+            .sidebar-nav { gap: 12px; }
+            .sidebar-menu { flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
+            .sidebar-menu li a { white-space: nowrap; }
+            .main-wrapper { height: auto; overflow: visible; }
+            .content { overflow-y: visible; padding: 16px; }
+            .navbar { padding: 0 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR DARK SOLID TERKUNCI -->
+    <div class="sidebar">
+        <div>
+            <!-- BRAND DENGAN LOGO DARI STATIC -->
+            <div class="sidebar-brand">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="brand-logo-img">
+                <div class="brand-text">
+                    <span class="brand-title">E-Jurnal PKL</span> 
+                    <span class="brand-subtitle">Panel Pembimbing</span>
+                </div>
+            </div>
+
+            <div class="sidebar-nav">
+                <div class="nav-group">
+                    <span class="nav-label">Main Menu</span>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="{{ url_for('dashboard_pembimbing') }}" class="{{ 'active' if request.endpoint == 'dashboard_pembimbing' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                                    Dashboard
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-label">Siswa & Absensi</span>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="{{ url_for('daftar_siswa') }}" class="{{ 'active' if request.endpoint == 'daftar_siswa' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    Daftar Siswa
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('tambah_siswa_page') }}" class="{{ 'active' if request.endpoint == 'tambah_siswa_page' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                                    Tambah Siswa
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('persetujuan_absensi') }}" class="{{ 'active' if request.endpoint == 'persetujuan_absensi' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                    Persetujuan Izin/Sakit
+                                </div>
+                                {% if pengajuan and pengajuan.pending_izin > 0 %}
+                                    <span class="menu-badge">{{ pengajuan.pending_izin }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('riwayat_absensi') }}" class="{{ 'active' if request.endpoint == 'riwayat_absensi' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                    Absensi Siswa
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-label">Jurnal & Laporan</span>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="{{ url_for('validasi_laporan') }}" class="{{ 'active' if request.endpoint in ['validasi_laporan', 'validasi_detail'] else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                    Validasi Laporan
+                                </div>
+                                {% if laporan and laporan.pending > 0 %}
+                                    <span class="menu-badge">{{ laporan.pending }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="navbar">
+            <div class="navbar-title">Dashboard Monitoring</div>
+            
+            <div class="navbar-right">
+                <a href="{{ url_for('profil_pembimbing') }}" class="btn-profile-nav">
+                    <div class="avatar-wrapper">
+                        <div class="nav-avatar-placeholder">
+                            {{ session['nama'][0]|upper }}
+                        </div>
+                        <span class="status-indicator"></span>
+                    </div>
+                    <span>{{ session['nama'] }}</span>
+                </a>
+
+                <button type="button" class="btn-logout-nav" onclick="openLogoutModal()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <div class="welcome-card">
+                <h3>Selamat Datang, {{ session['nama'] }}!</h3>
+                <p>Akses: Monitor Absensi, Approval Izin/Sakit, dan Validasi Jurnal Harian Siswa PKL.</p>
+            </div>
+
+            <div class="grid-cards">
+                <div class="card card-accent-primary">
+                    <div class="card-title">Total Siswa PKL</div>
+                    <div class="card-value">{{ total_siswa or 0 }}</div>
+                </div>
+                <div class="card card-accent-warning">
+                    <div class="card-title">Laporan Pending</div>
+                    <div class="card-value val-warning">{{ laporan.pending or 0 }}</div>
+                </div>
+                <div class="card card-accent-danger">
+                    <div class="card-title">Izin/Sakit Pending</div>
+                    <div class="card-value val-danger">{{ pengajuan.pending_izin if pengajuan else 0 }}</div>
+                </div>
+                <div class="card card-accent-success">
+                    <div class="card-title">Laporan Disetujui</div>
+                    <div class="card-value val-success">{{ laporan.disetujui or 0 }}</div>
+                </div>
+                <div class="card card-accent-primary">
+                    <div class="card-title">Total Absensi Hadir</div>
+                    <div class="card-value val-primary">{{ absensi.total_hadir if absensi else 0 }}</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <span>Laporan Harian Terbaru Masuk</span>
+                    <div class="table-search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" placeholder="Cari nama siswa...">
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Siswa</th>
+                            <th>Kelas</th>
+                            <th>Tanggal Kegiatan</th>
+                            <th>Status Validasi</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if laporan_list %}
+                            {% for l in laporan_list %}
+                            <tr>
+                                <td><strong>{{ l.nama_siswa }}</strong></td>
+                                <td>{{ l.kelas_jurusan }}</td>
+                                <td>
+                                    {% if l.tanggal %}
+                                        {{ l.tanggal }}
+                                    {% elif l.created_at %}
+                                        {{ l.created_at.strftime('%Y-%m-%d') if l.created_at.strftime is defined else l.created_at }}
+                                    {% else %}
+                                        <span style="color: var(--text-light);">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if l.status_validasi == 'Pending' %}
+                                        <span class="badge badge-pending">Pending</span>
+                                    {% elif l.status_validasi == 'Disetujui' %}
+                                        <span class="badge badge-disetujui">Disetujui</span>
+                                    {% else %}
+                                        <span class="badge badge-revisi">Revisi</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('validasi_detail', laporan_id=l.id) }}" class="btn btn-primary btn-sm">Periksa</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-light); padding: 32px;">Belum ada laporan harian masuk.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP KONFIRMASI LOGOUT -->
+    <div id="logoutModal" class="modal-overlay">
+        <div class="modal-box-logout">
+            <div class="modal-icon-logout">!</div>
+            <div class="modal-title-logout">Konfirmasi Logout</div>
+            <div class="modal-desc-logout">Apakah Anda yakin ingin keluar dari aplikasi E-Jurnal PKL?</div>
+            <div class="modal-actions-logout">
+                <button type="button" class="btn-modal btn-modal-cancel" onclick="closeLogoutModal()">Batal</button>
+                <a href="{{ url_for('logout') }}" class="btn-modal btn-modal-confirm">Ya, Keluar</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'flex';
+        }
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const logoutModal = document.getElementById('logoutModal');
+            if (event.target === logoutModal) {
+                closeLogoutModal();
+            }
+        }
+    </script>
+
+</body>
+</html>
