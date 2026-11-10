@@ -1003,6 +1003,7 @@
     </div>
 
     <script>
+        // Fungsi untuk Modal Logout
         function openLogoutModal() {
             document.getElementById('logoutModal').style.display = 'flex';
         }
@@ -1011,40 +1012,33 @@
             document.getElementById('logoutModal').style.display = 'none';
         }
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('logoutModal');
-            if (event.target === modal) {
-                closeLogoutModal();
+        // Fungsi untuk membuka/menutup dropdown lonceng notifikasi
+        function toggleNotificationDropdown(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('notificationDropdownMenu');
+            if (menu.style.display === 'block') {
+                menu.style.display = 'none';
+            } else {
+                menu.style.display = 'block';
             }
         }
-    // Fungsi untuk membuka/menutup dropdown lonceng notifikasi
-    function toggleNotificationDropdown(event) {
-        event.stopPropagation();
-        const menu = document.getElementById('notificationDropdownMenu');
-        if (menu.style.display === 'block') {
-            menu.style.display = 'none';
-        } else {
-            menu.style.display = 'block';
-        }
-    }
 
-    // Menutup dropdown jika pengguna mengklik di luar area lonceng/dropdown
-    window.addEventListener('click', function(event) {
-        const menu = document.getElementById('notificationDropdownMenu');
-        const container = document.querySelector('.notification-dropdown-container');
-        if (menu && container && !container.contains(event.target)) {
-            menu.style.display = 'none';
-        }
-    });
+        // Menutup dropdown atau modal logout jika pengguna mengklik di luar area komponen
+        window.addEventListener('click', function(event) {
+            const logoutModal = document.getElementById('logoutModal');
+            const menu = document.getElementById('notificationDropdownMenu');
+            const container = document.querySelector('.notification-dropdown-container');
 
-    // (Fungsi logout dan modal lainnya tetap berjalan seperti biasa)
-    function openLogoutModal() {
-        document.getElementById('logoutModal').style.display = 'flex';
-    }
-    function closeLogoutModal() {
-        document.getElementById('logoutModal').style.display = 'none';
-    }
+            // Tutup modal logout jika klik di luar box
+            if (event.target === logoutModal) {
+                closeLogoutModal();
+            }
 
+            // Tutup dropdown notifikasi jika klik di luar area lonceng
+            if (menu && container && !container.contains(event.target)) {
+                menu.style.display = 'none';
+            }
+        });
     </script>
 
 </body> 

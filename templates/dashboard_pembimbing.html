@@ -98,7 +98,6 @@
             margin-bottom: 24px;
         }
 
-        /* LOGO DI ATAS KIRI SIDEBAR */
         .brand-logo-img {
             width: 38px;
             height: 38px;
@@ -322,6 +321,7 @@
         /* HANYA KONTEN YANG BISA DI-SCROLL */
         .content {
             padding: 32px;
+            padding-right: 48px;
             max-width: 1400px;
             width: 100%;
             margin: 0 auto;
@@ -528,6 +528,18 @@
         }
         .btn-sm { padding: 6px 14px; font-size: 0.8125rem; }
 
+        /* FLASH ALERTS */
+        .alert {
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+        .alert-success { background-color: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+        .alert-danger, .alert-error { background-color: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
         /* MODAL LOGOUT */
         .modal-overlay {
             display: none;
@@ -597,7 +609,7 @@
             .sidebar-menu { flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
             .sidebar-menu li a { white-space: nowrap; }
             .main-wrapper { height: auto; overflow: visible; }
-            .content { overflow-y: visible; padding: 16px; }
+            .content { overflow-y: visible; padding: 16px; padding-right: 16px; }
             .navbar { padding: 0 16px; }
         }
     </style>
@@ -607,7 +619,6 @@
     <!-- SIDEBAR DARK SOLID TERKUNCI -->
     <div class="sidebar">
         <div>
-            <!-- BRAND DENGAN LOGO DARI STATIC -->
             <div class="sidebar-brand">
                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="brand-logo-img">
                 <div class="brand-text">
@@ -692,6 +703,7 @@
         </div>
     </div>
 
+    <!-- MAIN CONTENT WRAPPER -->
     <div class="main-wrapper">
         <div class="navbar">
             <div class="navbar-title">Dashboard Monitoring</div>
@@ -753,6 +765,22 @@
                     <div class="card-title">Total Absensi Hadir</div>
                     <div class="card-value val-primary">{{ absensi.total_hadir if absensi else 0 }}</div>
                 </div>
+            </div>
+
+            <!-- FORM INPUT PENGUMUMAN / PESAN UNTUK SISWA -->
+            <div class="card" style="margin-bottom: 28px; padding: 24px;">
+                <div style="font-weight: 800; font-size: 1.05rem; margin-bottom: 12px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                    <span>📢</span> Buat / Perbarui Pesan Pengumuman untuk Siswa
+                </div>
+                <form action="{{ url_for('update_pesan_pembimbing') }}" method="POST">
+                    <div style="margin-bottom: 14px;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Isi Pesan / Instruksi Penting:</label>
+                        <textarea name="pesan" rows="3" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.875rem; outline: none; font-family: inherit; resize: vertical;" placeholder="Ketik pengumuman penting di sini, misal: Hari ini semua siswa berkumpul di aula jam 10.00 WIB...">{{ pengumuman.pesan if pengumuman else '' }}</textarea>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary btn-sm">Simpan & Kirim ke Siswa</button>
+                    </div>
+                </form>
             </div>
 
             <div class="table-container">

@@ -221,32 +221,6 @@ def dashboard_siswa():
         pengumuman=pengumuman
     )
 
-@app.route('/pembimbing/update-pesan', methods=['POST'])
-def update_pesan_pembimbing():
-    if not is_logged_in() or session.get('role') not in ['pembimbing', 'admin']:
-        flash('Akses ditolak.', 'danger')
-        return redirect(url_for('login'))
-
-    pesan_baru = request.form.get('pesan', '').strip()
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Cek apakah sudah ada data pengumuman sebelumnya
-    cursor.execute("SELECT id FROM pengumuman_pembimbing LIMIT 1")
-    cek = cursor.fetchone()
-
-    if cek:
-        cursor.execute("UPDATE pengumuman_pembimbing SET pesan = %s WHERE id = %s", (pesan_baru, cek[0]))
-    else:
-        cursor.execute("INSERT INTO pengumuman_pembimbing (pesan) VALUES (%s)", (pesan_baru,))
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    flash('Pesan penting berhasil diperbarui untuk semua siswa!', 'success')
-    return redirect(url_for('dashboard_pembimbing'))
 
 @app.route('/dashboard/pembimbing')
 def dashboard_pembimbing():
@@ -300,6 +274,10 @@ def dashboard_pembimbing():
     """)
     laporan_pending = cursor.fetchall()
 
+    # 6. TAMBAHAN: Ambil pengumuman aktif untuk ditampilkan di form dashboard pembimbing
+    cursor.execute("SELECT * FROM pengumuman_pembimbing ORDER BY id DESC LIMIT 1")
+    pengumuman = cursor.fetchone()
+
     cursor.close()
     conn.close()
 
@@ -309,9 +287,40 @@ def dashboard_pembimbing():
         laporan=stat_laporan,
         absensi=stat_absensi,
         pengajuan=stat_pengajuan,
-        laporan_list=laporan_pending
+        laporan_list=laporan_pending,
+        penguman=pengumuman  # Dikirim ke HTML pembimbing
     )
 
+
+# TAMBAHAN: Rute untuk memproses simpan/perbarui pesan pengumuman dari pembimbing
+@app.route('/pembimbing/update-pesan', methods=['POST'])
+def update_pesan_pembimbing():
+    if not is_logged_in() or session.get('role') not in ['pembimbing_pkl', 'pembimbing_industri']:
+        flash('Akses ditolak.', 'danger')
+        return redirect(url_for('login'))
+
+    pesan_baru = request.form.get('pesan', '').strip()
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Cek apakah sudah ada baris pengumuman di database
+    cursor.execute("SELECT id FROM pengumuman_pembimbing LIMIT 1")
+    cek = cursor.fetchone()
+
+    if cek:
+        # Jika sudah ada, update pesannya
+        cursor.execute("UPDATE pengumuman_pembimbing SET pesan = %s WHERE id = %s", (pesan_baru, cek['id'] if isinstance(cek, dict) else cek[0]))
+    else:
+        # Jika belum ada, masukkan data baru
+        cursor.execute("INSERT INTO pengumuman_pembimbing (pesan) VALUES (%s)", (pesan_baru,))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    flash('Pengumuman berhasil diperbarui! Siswa akan langsung melihatnya di lonceng notifikasi.', 'success')
+    return redirect(url_for('dashboard_pembimbing'))
 # =========================================================
 # ROUTE PROFIL SISWA
 # =========================================================

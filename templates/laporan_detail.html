@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail Laporan Harian - E-Jurnal PKL</title>
     
-    <!-- FAVICON LOGO TAB BROWSER -->
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <!-- FAVICON (LOGO TAB BROWSER) -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -14,6 +14,8 @@
         :root {
             --bg-main: #f1f5f9;
             --bg-surface: #ffffff;
+            
+            /* Sidebar Dark Solid Modern */
             --bg-sidebar: #0f172a;
             --sidebar-header-bg: #1e293b;
             --sidebar-border: rgba(255, 255, 255, 0.08);
@@ -53,13 +55,22 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* KUNCI TINGGI BODY & CEGAH SCROLL UTAMA */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
             display: flex;
-            min-height: 100vh;
+            height: 100vh;
         }
 
+        /* ================= SIDEBAR TERKUNCI ================= */
         .sidebar {
             width: 270px;
             background-color: var(--bg-sidebar);
@@ -72,6 +83,8 @@
             justify-content: space-between;
             box-shadow: 4px 0 16px rgba(0, 0, 0, 0.08);
             z-index: 20;
+            height: 100vh;
+            overflow-y: auto;
         }
 
         .sidebar-brand {
@@ -92,88 +105,371 @@
             border-radius: 8px;
         }
 
-        .brand-text { display: flex; flex-direction: column; }
-        .brand-title { font-size: 1rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; line-height: 1.2; }
-        .brand-subtitle { font-size: 0.725rem; color: #818cf8; font-weight: 600; }
-
-        .sidebar-nav { display: flex; flex-direction: column; gap: 22px; flex-grow: 1; }
-        .nav-group { display: flex; flex-direction: column; gap: 4px; }
-        .nav-label { font-size: 0.6875rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.1em; padding: 0 12px 6px; }
-
-        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 4px; }
-        .sidebar-menu li a {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 11px 14px; color: var(--sidebar-text); text-decoration: none;
-            font-size: 0.875rem; font-weight: 500; border-radius: var(--radius-sm); transition: var(--transition);
+        .brand-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
         }
 
-        .menu-link-content { display: flex; align-items: center; gap: 12px; }
-        .sidebar-menu li a svg { width: 18px; height: 18px; stroke-width: 2.2; transition: var(--transition); opacity: 0.8; }
-        .sidebar-menu li a:hover { background-color: var(--sidebar-hover-bg); color: var(--sidebar-text-active); transform: translateX(3px); }
-        .sidebar-menu li a:hover svg { opacity: 1; color: #818cf8; }
-        .sidebar-menu li a.active { background-color: var(--sidebar-active-bg); color: #ffffff; font-weight: 600; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35); }
-        .sidebar-menu li a.active svg { color: #ffffff; opacity: 1; }
+        .brand-subtitle {
+            font-size: 0.725rem;
+            color: #818cf8;
+            font-weight: 600;
+        }
 
-        .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; z-index: 10; }
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            flex-grow: 1;
+        }
+
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-label {
+            font-size: 0.6875rem;
+            font-weight: 800;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0 12px 6px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 14px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .menu-link-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-menu li a svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2.2;
+            transition: var(--transition);
+            opacity: 0.8;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: var(--sidebar-hover-bg);
+            color: var(--sidebar-text-active);
+            transform: translateX(3px);
+        }
+
+        .sidebar-menu li a:hover svg {
+            opacity: 1;
+            color: #818cf8;
+        }
+
+        .sidebar-menu li a.active {
+            background-color: var(--sidebar-active-bg);
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+        }
+
+        .sidebar-menu li a.active svg {
+            color: #ffffff;
+            opacity: 1;
+        }
+
+        /* MAIN LAYOUT & NAVBAR TERKUNCI */
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 10;
+        }
 
         .navbar {
-            background-color: #ffffff; height: 70px; padding: 0 32px;
-            display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow-xs);
+            background-color: #ffffff;
+            height: 70px;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            z-index: 10;
+            box-shadow: var(--shadow-xs);
         }
 
-        .navbar-title { font-size: 1.05rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.02em; }
-        .navbar-right { display: flex; align-items: center; gap: 14px; }
-        .navbar-user { font-size: 0.875rem; font-weight: 600; color: var(--text-muted); }
+        .navbar-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .btn-profile-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 14px 5px 5px;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 9999px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: var(--shadow-xs);
+            position: relative;
+        }
+
+        .btn-profile-nav:hover {
+            border-color: var(--primary-border);
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .avatar-wrapper {
+            position: relative;
+        }
+
+        .nav-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .nav-avatar-placeholder {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, #818cf8 100%);
+            color: #ffffff;
+            font-size: 0.8125rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 9px;
+            height: 9px;
+            background-color: #22c55e;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+        }
 
         .btn-logout-nav {
-            display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
-            font-size: 0.8125rem; font-weight: 600; color: #ef4444; background-color: #fef2f2;
-            border: 1px solid #fee2e2; border-radius: var(--radius-sm); cursor: pointer; text-decoration: none; transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #ef4444;
+            background-color: #fef2f2;
+            border: 1px solid #fee2e2;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
         }
 
-        .btn-logout-nav:hover { background-color: #fde8e8; border-color: #fca5a5; transform: translateY(-1px); }
+        .btn-logout-nav:hover {
+            background-color: #fde8e8;
+            border-color: #fca5a5;
+            transform: translateY(-1px);
+        }
 
-        .content { padding: 32px; max-width: 1400px; width: 100%; margin: 0 auto; }
+        /* HANYA KONTEN YANG BISA DI-SCROLL */
+         .content {
+            padding: 32px;
+            padding-right: 48px; /* Menggeser scrollbar agak ke kiri */
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
 
         .btn-back {
-            display: inline-flex; align-items: center; margin-bottom: 20px;
-            color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.875rem; transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: var(--transition);
         }
 
-        .btn-back:hover { color: var(--primary); }
+        .btn-back:hover {
+            color: var(--primary);
+        }
 
         .card-detail {
-            background-color: var(--bg-surface); border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color); padding: 32px; max-width: 800px; margin: 0 auto; box-shadow: var(--shadow-sm);
+            background-color: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
         }
 
-        .detail-header { border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
-        .detail-title { font-size: 1.125rem; font-weight: 800; color: var(--text-main); }
-        .detail-row { display: flex; margin-bottom: 20px; font-size: 0.875rem; }
-        .detail-label { width: 180px; flex-shrink: 0; font-weight: 700; color: var(--text-muted); }
-        .detail-value { flex-grow: 1; color: var(--text-main); line-height: 1.6; }
+        .detail-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-        .badge { display: inline-flex; align-items: center; padding: 4px 10px; font-size: 0.75rem; font-weight: 700; border-radius: 9999px; letter-spacing: 0.01em; }
+        .detail-title {
+            font-size: 1.125rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 20px;
+            font-size: 0.875rem;
+        }
+
+        .detail-label {
+            width: 180px;
+            flex-shrink: 0;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .detail-value {
+            flex-grow: 1;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 9999px;
+            letter-spacing: 0.01em;
+        }
+
         .badge-pending { background-color: #fef3c7; color: #b45309; }
         .badge-disetujui { background-color: #dcfce7; color: #15803d; }
         .badge-revisi { background-color: #fee2e2; color: #b91c1c; }
 
-        .img-preview { max-width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-top: 8px; }
+        .badge-terlambat-detail {
+            background-color: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fcd34d;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 8px;
+            display: inline-block;
+        }
 
+        .alert-terlambat-detail {
+            background-color: #fffbebf7;
+            border: 1px solid #fcd34d;
+            border-left: 4px solid #d97706;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            margin-top: 6px;
+            color: #b45309;
+            font-size: 14px;
+        }
+
+        .img-preview {
+            max-width: 100%;
+            max-height: 350px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            margin-top: 8px;
+            object-fit: contain;
+        }
+
+        /* MODAL LOGOUT */
         .modal-overlay {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(15, 23, 42, 0.6); align-items: center; justify-content: center; padding: 16px;
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.6);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
         }
 
         .modal-box-logout {
-            background-color: var(--bg-surface); padding: 32px; border-radius: var(--radius-lg);
-            width: 100%; max-width: 420px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); text-align: center;
+            background-color: var(--bg-surface);
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 420px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            text-align: center;
         }
 
         .modal-icon-logout {
-            width: 56px; height: 56px; background-color: #fef2f2; color: #ef4444; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 1.5rem; font-weight: 700; border: 1px solid #fee2e2;
+            width: 56px;
+            height: 56px;
+            background-color: #fef2f2;
+            color: #ef4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border: 1px solid #fee2e2;
         }
 
         .modal-title-logout { font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
@@ -181,30 +477,31 @@
         .modal-actions-logout { display: flex; gap: 12px; }
 
         .btn-modal {
-            flex: 1; padding: 11px; font-size: 0.875rem; font-weight: 600; border-radius: var(--radius-sm);
-            cursor: pointer; border: 1px solid transparent; text-decoration: none; text-align: center; transition: var(--transition);
+            flex: 1;
+            padding: 11px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-decoration: none;
+            text-align: center;
+            transition: var(--transition);
         }
 
         .btn-modal-cancel { background-color: var(--bg-surface); color: var(--text-main); border-color: var(--border-color); }
         .btn-modal-confirm { background-color: #ef4444; color: #ffffff; }
 
-        .badge-terlambat-detail {
-            background-color: #fef3c7; color: #b45309; border: 1px solid #fcd34d;
-            padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 700; margin-left: 8px; display: inline-block;
-        }
-        .alert-terlambat-detail {
-            background-color: #fffbebf7; border: 1px solid #fcd34d; border-left: 4px solid #d97706;
-            padding: 12px 16px; border-radius: var(--radius-sm); margin-top: 6px; color: #b45309; font-size: 14px;
-        }
-
         @media (max-width: 768px) {
+            html, body { overflow: auto; height: auto; }
             body { flex-direction: column; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--sidebar-border); }
+            .sidebar { width: 100%; height: auto; overflow-y: visible; border-right: none; border-bottom: 1px solid var(--sidebar-border); }
             .sidebar-nav { gap: 12px; }
             .sidebar-menu { flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
             .sidebar-menu li a { white-space: nowrap; }
+            .main-wrapper { height: auto; overflow: visible; }
+            .content { overflow-y: visible; padding: 16px; padding-right: 16px; }
             .navbar { padding: 0 16px; }
-            .content { padding: 16px; }
             .card-detail { padding: 20px; }
             .detail-row { flex-direction: column; }
             .detail-label { width: 100%; margin-bottom: 4px; }
@@ -213,19 +510,20 @@
 </head>
 <body>
 
+    <!-- SIDEBAR DARK SOLID TERKUNCI -->
     <div class="sidebar">
         <div>
             <div class="sidebar-brand">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="brand-logo-img">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="brand-logo-img">
                 <div class="brand-text">
-                    <span class="brand-title">E-Jurnal PKL</span>
+                    <span class="brand-title">E-Jurnal PKL</span> 
                     <span class="brand-subtitle">Panel Siswa</span>
                 </div>
             </div>
 
             <div class="sidebar-nav">
                 <div class="nav-group">
-                    <span class="nav-label">Menu Utama</span>
+                    <span class="nav-label">Main Menu</span>
                     <ul class="sidebar-menu">
                         <li>
                             <a href="{{ url_for('dashboard_siswa') }}" class="{{ 'active' if request.endpoint == 'dashboard_siswa' else '' }}">
@@ -235,26 +533,24 @@
                                 </div>
                             </a>
                         </li>
+                    </ul>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-label">Absensi</span>
+                    <ul class="sidebar-menu">
                         <li>
-                            <a href="{{ url_for('profil') }}" class="{{ 'active' if request.endpoint == 'profil' else '' }}">
+                            <a href="{{ url_for('absensi') }}" class="{{ 'active' if request.endpoint == 'absensi' else '' }}">
                                 <div class="menu-link-content">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                    Profil Saya
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ url_for('laporan') }}" class="{{ 'active' if request.endpoint in ['laporan', 'laporan_tambah', 'laporan_edit', 'laporan_detail'] else '' }}">
-                                <div class="menu-link-content">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                                    Laporan Harian
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                    Absensi Harian
                                 </div>
                             </a>
                         </li>
                         <li>
                             <a href="{{ url_for('pengajuan_absensi') }}" class="{{ 'active' if request.endpoint == 'pengajuan_absensi' else '' }}">
                                 <div class="menu-link-content">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                                     Pengajuan Izin/Sakit
                                 </div>
                             </a>
@@ -269,15 +565,44 @@
                         </li>
                     </ul>
                 </div>
+
+                <div class="nav-group">
+                    <span class="nav-label">Jurnal & Laporan</span>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="{{ url_for('laporan') }}" class="{{ 'active' if request.endpoint in ['laporan', 'laporan_tambah', 'laporan_edit', 'laporan_detail'] else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                    Laporan Harian
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- MAIN CONTENT WRAPPER -->
     <div class="main-wrapper">
         <div class="navbar">
             <div class="navbar-title">Detail Laporan Harian</div>
+            
             <div class="navbar-right">
-                <div class="navbar-user">Halo, {{ session['nama'] }} (Siswa)</div>
+                <a href="{{ url_for('profil') }}" class="btn-profile-nav">
+                    <div class="avatar-wrapper">
+                        {% if siswa and siswa.foto_profil %}
+                            <img src="{{ url_for('static', filename='uploads/profil/' ~ siswa.foto_profil) }}" alt="Foto Profil" class="nav-avatar">
+                        {% else %}
+                            <div class="nav-avatar-placeholder">
+                                {{ session['nama'][0]|upper }}
+                            </div>
+                        {% endif %}
+                        <span class="status-indicator"></span>
+                    </div>
+                    <span>{{ session['nama'] }}</span>
+                </a>
+
                 <button type="button" class="btn-logout-nav" onclick="openLogoutModal()">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -375,7 +700,7 @@
         </div>
     </div>
 
-    <!-- POPUP KONFIRMASI LOGOUT -->
+    <!-- POPUP LOGOUT -->
     <div id="logoutModal" class="modal-overlay">
         <div class="modal-box-logout">
             <div class="modal-icon-logout">!</div>
@@ -392,6 +717,7 @@
         function openLogoutModal() {
             document.getElementById('logoutModal').style.display = 'flex';
         }
+
         function closeLogoutModal() {
             document.getElementById('logoutModal').style.display = 'none';
         }
