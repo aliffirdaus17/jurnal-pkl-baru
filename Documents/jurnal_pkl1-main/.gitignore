@@ -1,0 +1,22 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Virtual Environment
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+
+# Uploads (jika berisi file pribadi/user)
+uploads/*
+
+# Temporary files
+*.log
+.DS_Store

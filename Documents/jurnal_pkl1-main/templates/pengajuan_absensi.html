@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengajuan Izin / Sakit - E-Jurnal PKL</title>
+    
+    <!-- FAVICON (LOGO TAB BROWSER) -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+
+    <style>
+        /* Style khusus halaman ini; komponen bersama ada di static/css/app.css */
+        .card {
+            margin-bottom: 24px;
+        }
+        .card-header-title {
+            font-size: var(--text-md);
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: -0.01em;
+        }
+
+        /* Style Lonceng Notifikasi */
+        .btn-notification-bell {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            position: relative;
+        }
+        .btn-notification-bell:hover {
+            background-color: var(--primary-50);
+            color: var(--primary);
+            border-color: var(--primary-200);
+        }
+        .notification-count-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background-color: var(--danger);
+            color: #ffffff;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid var(--surface);
+        }
+        .notification-dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 48px;
+            width: 360px;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+            animation: fadeIn 0.2s ease-out;
+            overflow: hidden;
+        }
+        .dropdown-header {
+            padding: 14px 16px;
+            background-color: var(--bg-app);
+            border-bottom: 1px solid var(--border);
+            font-weight: 700;
+            font-size: var(--text-sm);
+            color: var(--text);
+        }
+        .dropdown-body {
+            padding: 12px;
+            max-height: 290px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .notif-item {
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background-color: var(--surface);
+            transition: var(--transition);
+        }
+        .notif-item.unread {
+            background-color: var(--info-bg);
+            border-color: var(--info-border);
+        }
+        .notif-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .notif-badge-new {
+            background-color: var(--primary);
+            color: #ffffff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: var(--radius-full);
+            text-transform: uppercase;
+        }
+        .dropdown-announcement-text {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        .dropdown-timestamp {
+            font-size: var(--text-xs);
+            color: var(--text-faint);
+            font-weight: 600;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 20px;
+            }
+            .notification-dropdown-menu {
+                width: 300px;
+                right: -60px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR DARK SOLID TERKUNCI -->
+    <div class="sidebar">
+        <div>
+            <div class="sidebar-brand">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="brand-logo-img">
+                <div class="brand-text">
+                    <span class="brand-title">E-Jurnal PKL</span> 
+                    <span class="brand-subtitle">Panel Siswa</span>
+                </div>
+            </div>
+
+            <div class="sidebar-nav">
+                <div class="nav-group">
+                    <span class="nav-label">Main Menu</span>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="{{ url_for('dashboard_siswa') }}" class="{{ 'active' if request.endpoint == 'dashboard_siswa' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                                    Dashboard
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-label">Absensi</span>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="{{ url_for('absensi') }}" class="{{ 'active' if request.endpoint == 'absensi' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                    Absensi Harian
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('pengajuan_absensi') }}" class="{{ 'active' if request.endpoint == 'pengajuan_absensi' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                    Pengajuan Izin/Sakit
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('riwayat_absensi') }}" class="{{ 'active' if request.endpoint == 'riwayat_absensi' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                    Riwayat Absensi
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-label">Jurnal & Laporan</span>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="{{ url_for('laporan') }}" class="{{ 'active' if request.endpoint in ['laporan', 'laporan_tambah', 'laporan_edit', 'laporan_detail'] else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                    Laporan Harian
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="navbar">
+            <div class="navbar-title">Form Pengajuan Ketidakhadiran</div>
+            
+            <div class="navbar-right" style="display: flex; align-items: center; gap: 12px;">
+                <!-- LONCENG PESAN / PENGUMUMAN -->
+                <div class="notification-dropdown-container" style="position: relative;">
+                    <button type="button" class="btn-notification-bell" onclick="toggleNotificationDropdown(event)" title="Pengumuman Pembimbing">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span id="badgeNotifCount" class="notification-count-badge" style="display: none;">0</span>
+                    </button>
+
+                    <div id="notificationDropdownMenu" class="notification-dropdown-menu">
+                        <div class="dropdown-header">
+                            <span>Pengumuman Pembimbing</span>
+                        </div>
+                        <div class="dropdown-body">
+                            {% if pengumuman_list %}
+                                {% for item in pengumuman_list %}
+                                    <div class="notif-item item-pengumuman" data-id="{{ item.id }}">
+                                        <div class="notif-item-header">
+                                            <div class="dropdown-timestamp">
+                                                {{ item.updated_at.strftime('%d %b %Y, %H:%M') if item.updated_at and item.updated_at.strftime is defined else item.updated_at }}
+                                            </div>
+                                            <span class="notif-badge-new badge-baru-item" style="display: none;">Baru</span>
+                                        </div>
+                                        <div class="dropdown-announcement-text">{{ item.pesan }}</div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div style="text-align: center; color: var(--text-faint); padding: 20px 0; font-size: var(--text-sm);">
+                                    Belum ada pengumuman saat ini.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{{ url_for('profil') }}" class="btn-profile-nav">
+                    <div class="avatar-wrapper">
+                        {% if siswa and siswa.foto_profil %}
+                            <img src="{{ url_for('static', filename='uploads/profil/' ~ siswa.foto_profil) }}" alt="Foto Profil" class="nav-avatar">
+                        {% else %}
+                            <div class="nav-avatar-placeholder">
+                                {{ session['nama'][0]|upper }}
+                            </div>
+                        {% endif %}
+                        <span class="status-indicator"></span>
+                    </div>
+                    <span>{{ session['nama'] }}</span>
+                </a>
+
+                <button type="button" class="btn-logout-nav" onclick="openLogoutModal()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <div class="card">
+                <div class="card-header-title">
+                    <span>Form Pengajuan</span>
+                    <span style="font-size: var(--text-base); color: var(--text-muted); font-weight: 600;">Hari Ini: {{ today }}</span>
+                </div>
+
+                {% if sudah_alpa %}
+                    <div class="alert alert-danger" style="margin-bottom: 0;">
+                        ⛔ <strong>Pengajuan Ditutup:</strong> Anda telah tercatat <strong>ALPA</strong> untuk hari ini (melewati batas waktu pukul 15:00 WIB atau ditandai oleh Pembimbing), sehingga tidak dapat membuat pengajuan Izin/Sakit.
+                    </div>
+                {% elif sudah_hadir %}
+                    <div class="alert alert-success" style="margin-bottom: 0;">
+                        ✓ <strong>Informasi Presensi:</strong> Anda sudah melakukan absensi <strong>HADIR</strong> untuk hari ini, sehingga tidak dapat mengajukan Izin/Sakit.
+                    </div>
+                {% elif sudah_pengajuan %}
+                    <div class="alert alert-warning" style="margin-bottom: 0;">
+                        📌 <strong>Informasi Pengajuan:</strong> Anda sudah mengirimkan pengajuan untuk hari ini. Silakan cek status persetujuan pada tabel riwayat di bawah.
+                    </div>
+                {% else %}
+                    <form action="{{ url_for('pengajuan_absensi') }}" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="form-group">
+                            <label for="jenis">Jenis Pengajuan</label>
+                            <select name="jenis" id="jenis" required>
+                                <option value="Izin">Izin</option>
+                                <option value="Sakit">Sakit</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="alasan">Alasan / Keterangan (Minimal 10 Karakter) <span style="color: var(--danger);">*</span></label>
+                            <textarea 
+                                name="alasan" 
+                                id="alasan" 
+                                rows="3" 
+                                minlength="10" 
+                                placeholder="Tuliskan alasan tidak dapat hadir secara rinci (minimal 10 karakter)..." 
+                                required 
+                                oninvalid="this.setCustomValidity(this.value.length === 0 ? 'Harap isi bidang ini.' : 'Harap perpanjang teks ini hingga 10 karakter atau lebih (saat ini Anda menggunakan ' + this.value.length + ' karakter).')" 
+                                oninput="this.setCustomValidity('')"></textarea>
+                            <small class="file-hint">Minimal 10 karakter.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bukti_file">Upload Surat Dokter / Bukti Lampiran <span style="color: var(--danger);">*</span></label>
+                            <input type="file" name="bukti_file" id="bukti_file" accept="image/*,.pdf" required>
+                            <small class="file-hint">Format yang diizinkan: PNG, JPG, JPEG, PDF.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Kirim Pengajuan</button>
+                    </form>
+                {% endif %}
+            </div>
+
+            <div class="card">
+                <div class="card-header-title">Riwayat Pengajuan</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Jenis</th>
+                                <th>Alasan</th>
+                                <th>Status Persetujuan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if pengajuan_list %}
+                                {% for p in pengajuan_list %}
+                                <tr>
+                                    <td><strong>{{ p.tanggal }}</strong></td>
+                                    <td><strong>{{ p.jenis }}</strong></td>
+                                    <td>{{ p.alasan }}</td>
+                                    <td>
+                                        <span class="badge badge-{{ p.status_pengajuan|lower }}">{{ p.status_pengajuan }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" style="text-align: center; color: var(--text-faint); padding: 32px;">Belum ada pengajuan.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP LOGOUT -->
+    <div id="logoutModal" class="modal-overlay">
+        <div class="modal-box-logout">
+            <div class="modal-icon-logout">!</div>
+            <div class="modal-title-logout">Konfirmasi Logout</div>
+            <div class="modal-desc-logout">Apakah Anda yakin ingin keluar dari aplikasi E-Jurnal PKL?</div>
+            <div class="modal-actions-logout">
+                <button type="button" class="btn-modal btn-modal-cancel" onclick="closeLogoutModal()">Batal</button>
+                <a href="{{ url_for('logout') }}" class="btn-modal btn-modal-confirm">Ya, Keluar</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'flex';
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+
+        // Dropdown Lonceng Notifikasi & LocalStorage
+        function toggleNotificationDropdown(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('notificationDropdownMenu');
+            const isOpening = menu.style.display !== 'block';
+
+            if (isOpening) {
+                menu.style.display = 'block';
+
+                const listItems = document.querySelectorAll('.item-pengumuman');
+                let seenIds = JSON.parse(localStorage.getItem('seen_pengumuman_ids') || '[]');
+                let allCurrentIds = [];
+
+                listItems.forEach(item => {
+                    const id = parseInt(item.getAttribute('data-id'));
+                    if (!isNaN(id)) {
+                        allCurrentIds.push(id);
+                    }
+                    const badgeBaru = item.querySelector('.badge-baru-item');
+                    if (badgeBaru) badgeBaru.style.display = 'none';
+                    item.classList.remove('unread');
+                });
+
+                let updatedSeenIds = Array.from(new Set([...seenIds, ...allCurrentIds]));
+                localStorage.setItem('seen_pengumuman_ids', JSON.stringify(updatedSeenIds));
+
+                const badgeCount = document.getElementById('badgeNotifCount');
+                if (badgeCount) {
+                    badgeCount.style.display = 'none';
+                    badgeCount.textContent = '0';
+                }
+            } else {
+                menu.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const listItems = document.querySelectorAll('.item-pengumuman');
+            const badgeCount = document.getElementById('badgeNotifCount');
+            
+            let seenIds = JSON.parse(localStorage.getItem('seen_pengumuman_ids') || '[]');
+            let unreadCount = 0;
+
+            listItems.forEach(item => {
+                const id = parseInt(item.getAttribute('data-id'));
+                if (!isNaN(id) && !seenIds.includes(id)) {
+                    unreadCount++;
+                    item.classList.add('unread');
+                    const badgeBaru = item.querySelector('.badge-baru-item');
+                    if (badgeBaru) badgeBaru.style.display = 'inline-block';
+                }
+            });
+
+            if (unreadCount > 0 && badgeCount) {
+                badgeCount.textContent = unreadCount;
+                badgeCount.style.display = 'flex';
+            }
+        });
+
+        window.onclick = function(event) {
+            const logoutModal = document.getElementById('logoutModal');
+            const menu = document.getElementById('notificationDropdownMenu');
+            const container = document.querySelector('.notification-dropdown-container');
+
+            if (event.target === logoutModal) {
+                closeLogoutModal();
+            }
+
+            if (menu && container && !container.contains(event.target)) {
+                menu.style.display = 'none';
+            }
+        }
+    </script>
+
+</body>
+</html>

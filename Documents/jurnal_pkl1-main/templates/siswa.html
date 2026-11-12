@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Siswa Bimbingan - E-Jurnal PKL</title>
+    
+    <!-- FAVICON (LOGO TAB BROWSER) -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+
+<style>
+    /* Style khusus halaman ini; komponen bersama ada di static/css/app.css */
+    .action-bar {
+        margin-bottom: 24px;
+    }
+    .search-form-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr) auto auto;
+        gap: 12px;
+        background-color: var(--surface);
+        padding: 24px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+    }
+    .search-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-size: var(--text-base);
+        color: var(--text);
+        background-color: var(--surface);
+        outline: none;
+        transition: var(--transition);
+    }
+    .search-input:focus {
+        border-color: var(--primary);
+        box-shadow: var(--focus-ring);
+    }
+    .btn-search-action {
+        background-color: var(--primary);
+        color: #ffffff;
+        padding: 10px 18px;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        font-size: var(--text-sm);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: var(--transition);
+        border: 1px solid transparent;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    .btn-search-action:hover {
+        background-color: var(--primary-hover);
+    }
+    .btn-reset-action {
+        background-color: var(--surface);
+        color: var(--text-secondary);
+        padding: 10px 18px;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        font-size: var(--text-sm);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border);
+        transition: var(--transition);
+        white-space: nowrap;
+    }
+    .btn-reset-action:hover {
+        background-color: var(--bg-app);
+        color: var(--text);
+        border-color: var(--border-strong);
+    }
+
+    /* =========================================
+       STYLING TOMBOL AKSI TABEL (AGAR TIDAK POLOS)
+       ========================================= */
+    .btn-table-action {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        box-shadow: var(--shadow-xs);
+        border: 1px solid transparent;
+        cursor: pointer;
+        color: #ffffff;
+        white-space: nowrap;
+    }
+    .btn-table-action:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+        opacity: 0.92;
+    }
+    
+    /* Varian warna tombol tabel */
+    .btn-action-detail { background-color: var(--primary); }
+    .btn-action-edit { background-color: #2563eb; }
+    .btn-action-nilai { background-color: #7c3aed; }
+    .btn-action-aktif { background-color: var(--success); border: none; }
+    .btn-action-nonaktif { background-color: var(--danger); border: none; }
+
+    @media (max-width: 992px) {
+        .search-form-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    @media (max-width: 768px) {
+        .search-form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+<body>
+
+    <!-- SIDEBAR DARK SOLID -->
+    <div class="sidebar">
+        <div>
+            <!-- BRAND DENGAN LOGO DARI STATIC -->
+            <div class="sidebar-brand">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="brand-logo-img">
+                <div class="brand-text">
+                    <span class="brand-title">E-Jurnal PKL</span> 
+                    <span class="brand-subtitle">Panel Pembimbing</span>
+                </div>
+            </div>
+
+            <div class="sidebar-nav">
+                <div class="nav-group">
+                    <span class="nav-label">Main Menu</span>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="{{ url_for('dashboard_pembimbing') }}" class="{{ 'active' if request.endpoint == 'dashboard_pembimbing' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                                    Dashboard
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-label">Siswa & Absensi</span>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="{{ url_for('daftar_siswa') }}" class="{{ 'active' if request.endpoint in ['daftar_siswa', 'detail_siswa'] else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    Daftar Siswa
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('tambah_siswa_page') }}" class="{{ 'active' if request.endpoint == 'tambah_siswa_page' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                                    Tambah Siswa
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('persetujuan_absensi') }}" class="{{ 'active' if request.endpoint == 'persetujuan_absensi' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                    Persetujuan Izin/Sakit
+                                </div>
+                                {% if pengajuan and pengajuan.pending_izin > 0 %}
+                                    <span class="menu-badge">{{ pengajuan.pending_izin }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('riwayat_absensi') }}" class="{{ 'active' if request.endpoint == 'riwayat_absensi' else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                    Absensi Siswa
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-label">Jurnal & Laporan</span>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a href="{{ url_for('validasi_laporan') }}" class="{{ 'active' if request.endpoint in ['validasi_laporan', 'validasi_detail'] else '' }}">
+                                <div class="menu-link-content">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                    Validasi Laporan
+                                </div>
+                                {% if laporan and laporan.pending > 0 %}
+                                    <span class="menu-badge">{{ laporan.pending }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="main-wrapper">
+        <div class="navbar">
+            <div class="navbar-title">Daftar Siswa PKL</div>
+            
+            <div class="navbar-right" style="display: flex; align-items: center; gap: 12px;">
+                <!-- Tombol Profil -->
+                <a href="{{ url_for('profil_pembimbing') }}" class="btn-profile-nav">
+                    <div class="avatar-wrapper">
+                        <div class="nav-avatar-placeholder">
+                            {{ session['nama'][0]|upper }}
+                        </div>
+                        <span class="status-indicator"></span>
+                    </div>
+                    <span>{{ session['nama'] }}</span>
+                </a>
+
+                <!-- Tombol Logout -->
+                <button type="button" class="btn-logout-nav" onclick="openLogoutModal()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- NOTIFIKASI FLASH MESSAGE -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <div class="action-bar">
+                <!-- FORM PENCARIAN DENGAN 3 INPUT BERBEDA -->
+                <form action="{{ url_for('daftar_siswa') }}" method="GET" class="search-form-grid">
+                    <input type="text" name="nama" class="search-input" placeholder="Cari Nama Siswa" value="{{ filter_nama or '' }}">
+                    <input type="text" name="nisn" class="search-input" placeholder="Cari NISN" value="{{ filter_nisn or '' }}">
+                    <input type="text" name="sekolah" class="search-input" placeholder="Cari Asal Sekolah" value="{{ filter_sekolah or '' }}">
+                    
+                    <button type="submit" class="btn-search-action">Cari</button>
+                    {% if filter_nama or filter_nisn or filter_sekolah %}
+                        <a href="{{ url_for('daftar_siswa') }}" class="btn-reset-action">Reset</a>
+                    {% endif %}
+                </form>
+            </div>
+
+            <!-- TABEL DAFTAR SISWA -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>NISN / Username</th>
+                            <th>Nama Siswa</th>
+                            <th>Kelas / Jurusan</th>
+                            <th>Asal Sekolah</th>
+                            <th>Status</th>
+                            <th style="text-align: center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if siswa_list %}
+                            {% for s in siswa_list %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td><strong>{{ s.username }}</strong></td>
+                                <td>{{ s.nama }}</td>
+                                <td>{{ s.kelas_jurusan }}</td>
+                                <td>{{ s.sekolah }}</td>
+                                <td>
+                                    {% if s.is_active|int == 0 %}
+                                        <span class="badge badge-revisi">Nonaktif</span>
+                                    {% else %}
+                                        <span class="badge badge-disetujui">Aktif</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;">
+                                    <div style="display: inline-flex; gap: 6px; align-items: center;">
+                                        <!-- Tombol Detail -->
+                                        <a href="{{ url_for('detail_siswa', siswa_id=s.id) }}" class="btn-table-action btn-action-detail">
+                                            Detail
+                                        </a>
+
+                                        <!-- Tombol Edit -->
+                                        <a href="{{ url_for('edit_siswa_page', siswa_id=s.id) }}" class="btn-table-action btn-action-edit">
+                                            Edit
+                                        </a>
+
+                                        <!-- Tombol Nilai -->
+                                        <a href="{{ url_for('nilai_siswa_page', siswa_id=s.id) }}" class="btn-table-action btn-action-nilai">
+                                            Nilai
+                                        </a>
+
+                                        <!-- Tombol Toggle Nonaktifkan / Aktifkan -->
+                                        {% if s.is_active|int == 0 %}
+                                            <button type="button" class="btn-table-action btn-action-aktif" onclick="openToggleModalList('{{ s.id }}', '{{ s.nama }}', 0)">
+                                                Aktifkan
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn-table-action btn-action-nonaktif" onclick="openToggleModalList('{{ s.id }}', '{{ s.nama }}', 1)">
+                                                Nonaktifkan
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" style="text-align: center; color: var(--text-faint); padding: 32px;">Data siswa tidak ditemukan.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP MODAL TOGGLE STATUS DINAMIS -->
+    <div id="toggleModalList" class="modal-overlay">
+        <div class="modal-box-logout">
+            <div id="toggleModalIcon" class="modal-icon-logout">!</div>
+            <div id="toggleModalTitle" class="modal-title-logout">Konfirmasi Status Akun</div>
+            <div id="toggleModalDesc" class="modal-desc-logout">Apakah Anda yakin ingin mengubah status akun siswa ini?</div>
+            
+            <form id="toggleFormList" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-actions-logout">
+                    <button type="button" class="btn-modal btn-modal-cancel" onclick="closeToggleModalList()">Batal</button>
+                    <button type="submit" id="toggleSubmitBtn" class="btn-modal btn-modal-confirm">Ya, Lanjutkan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- POPUP LOGOUT -->
+    <div id="logoutModal" class="modal-overlay">
+        <div class="modal-box-logout">
+            <div class="modal-icon-logout">!</div>
+            <div class="modal-title-logout">Konfirmasi Logout</div>
+            <div class="modal-desc-logout">Apakah Anda yakin ingin keluar dari aplikasi E-Jurnal PKL?</div>
+            <div class="modal-actions-logout">
+                <button type="button" class="btn-modal btn-modal-cancel" onclick="closeLogoutModal()">Batal</button>
+                <a href="{{ url_for('logout') }}" class="btn-modal btn-modal-confirm">Ya, Keluar</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fungsionalitas Modal Toggle Status Siswa
+        function openToggleModalList(siswaId, namaSiswa, currentIsActive) {
+            const modal = document.getElementById('toggleModalList');
+            const form = document.getElementById('toggleFormList');
+            const icon = document.getElementById('toggleModalIcon');
+            const title = document.getElementById('toggleModalTitle');
+            const desc = document.getElementById('toggleModalDesc');
+            const submitBtn = document.getElementById('toggleSubmitBtn');
+
+            form.action = "/pembimbing/siswa/toggle-status/" + siswaId;
+
+            if (currentIsActive == 1) {
+                icon.style.backgroundColor = "var(--danger-bg)";
+                icon.style.color = "var(--danger)";
+                icon.style.border = "1px solid var(--danger-border)";
+                icon.innerText = "!";
+                
+                title.innerText = "Konfirmasi Nonaktifkan Akun";
+                desc.innerHTML = `Apakah Anda yakin ingin <strong>menonaktifkan</strong> akun <strong>${namaSiswa}</strong>? Siswa ini tidak akan bisa login ke sistem sampai diaktifkan kembali.`;
+                
+                submitBtn.style.backgroundColor = "var(--danger)";
+                submitBtn.innerText = "Ya, Nonaktifkan";
+            } else {
+                icon.style.backgroundColor = "var(--success-bg)";
+                icon.style.color = "var(--success)";
+                icon.style.border = "1px solid var(--success-border)";
+                icon.innerText = "✓";
+                
+                title.innerText = "Konfirmasi Aktifkan Akun";
+                desc.innerHTML = `Apakah Anda yakin ingin <strong>mengaktifkan kembali</strong> akun <strong>${namaSiswa}</strong>? Siswa ini akan dapat login kembali ke aplikasi.`;
+                
+                submitBtn.style.backgroundColor = "var(--success)";
+                submitBtn.innerText = "Ya, Aktifkan";
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeToggleModalList() {
+            document.getElementById('toggleModalList').style.display = 'none';
+        }
+
+        // Fungsionalitas Modal Logout (PERBAIKAN UTAMA)
+        function openLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'flex';
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+
+        // Menutup modal otomatis ketika pengguna mengklik area luar kotak modal
+        window.onclick = function(event) {
+            const logoutModal = document.getElementById('logoutModal');
+            const toggleModal = document.getElementById('toggleModalList');
+            if (event.target === logoutModal) {
+                closeLogoutModal();
+            }
+            if (event.target === toggleModal) {
+                closeToggleModalList();
+            }
+        }
+    </script>
+
+</body>
+</html>
